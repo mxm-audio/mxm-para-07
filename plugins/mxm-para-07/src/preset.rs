@@ -891,17 +891,47 @@ mod tests {
             }
         }
     }
+
+    /// The shipped file against the design with each value compared within rounding, everything
+    /// else exactly. The files hold Windows' bits, and each platform's maths library rounds in its
+    /// own way: macOS computes a gain's normalised value one step away (the owner, 2026-10-06: pin
+    /// on Windows only).
+    fn assert_same_within_rounding(shipped: &Preset, designed: &Preset, name: &str) {
+        for (id, value) in &shipped.params {
+            let by_design = designed
+                .params
+                .get(id)
+                .unwrap_or_else(|| panic!("regenerate {name}: {id} is not in the design"));
+            assert!(
+                (value.v - by_design.v).abs() <= 1.0e-6,
+                "regenerate {name}: {id} is {} in the file and {} by design",
+                value.v,
+                by_design.v
+            );
+        }
+        let (mut shipped, mut designed) = (shipped.clone(), designed.clone());
+        for value in shipped
+            .params
+            .values_mut()
+            .chain(designed.params.values_mut())
+        {
+            value.v = 0.0;
+        }
+        assert_eq!(shipped, designed, "regenerate {name}");
+    }
+
     #[test]
     fn shipped_factory_files_match_the_design_and_are_complete() {
         let params = MxmPara07Params::default();
         for (name, category, overrides) in FACTORY_DESIGN {
             let text = FACTORY_FILES.iter().find(|(n, _)| n == name).unwrap().1;
             let shipped = Preset::parse(text, crate::CLAP_ID).unwrap();
-            assert_eq!(
-                shipped,
-                generated(&params, name, *category, overrides),
-                "regenerate {name}"
-            );
+            let designed = generated(&params, name, *category, overrides);
+            if cfg!(target_os = "windows") {
+                assert_eq!(shipped, designed, "regenerate {name}");
+            } else {
+                assert_same_within_rounding(&shipped, &designed, name);
+            }
             assert!(
                 shipped.resolve(&params).1.is_empty(),
                 "{name} is incomplete"
