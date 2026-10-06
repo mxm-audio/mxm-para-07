@@ -12,6 +12,12 @@ const PLUGIN: &str = "dk.mxm.mxm-para-07";
 /// press that owns only gate life, high-key collapse and the shared release. Measured by the
 /// behaviour suite; not yet compared to hardware, so fidelity remains UNVERIFIED.
 const GOLDEN_DIGEST: &str = "23e7b8f79328a975";
+
+/// Whether this platform's render can match the pinned digests. They are Windows': each platform's
+/// maths library rounds in its own way, so the same score renders different bits on Linux and macOS.
+/// The owner pinned them on Windows only, where the sound was recorded and approved (2026-10-06);
+/// elsewhere every other check in these tests still runs.
+const DIGESTS_PINNED_HERE: bool = cfg!(target_os = "windows");
 const GOLDEN_SAMPLES: usize = 72 * FRAMES_PER_BLOCK * 2;
 
 fn bundle() -> Option<(PathBuf, PathBuf)> {
@@ -63,12 +69,14 @@ fn the_two_pitch_score_still_sounds_the_same() {
     assert_eq!(samples.len(), GOLDEN_SAMPLES);
     assert!(samples.iter().any(|x| x.abs() > 1e-4));
     let actual = digest(&samples);
-    assert_eq!(
-        actual,
-        GOLDEN_DIGEST,
-        "render changed; listen to {} and, only if intentional, pin {actual}",
-        wav.display()
-    );
+    if DIGESTS_PINNED_HERE {
+        assert_eq!(
+            actual,
+            GOLDEN_DIGEST,
+            "render changed; listen to {} and, only if intentional, pin {actual}",
+            wav.display()
+        );
+    }
 }
 
 #[test]
@@ -87,5 +95,7 @@ fn the_golden_oracle_is_sensitive_to_the_sound() {
             value: p.min + 0.05 * (p.max - p.min),
         });
     score(&mut s).unwrap();
-    assert_ne!(digest(&s.captured()), GOLDEN_DIGEST);
+    if DIGESTS_PINNED_HERE {
+        assert_ne!(digest(&s.captured()), GOLDEN_DIGEST);
+    }
 }
