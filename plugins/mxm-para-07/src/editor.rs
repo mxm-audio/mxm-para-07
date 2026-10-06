@@ -109,7 +109,8 @@ impl Section {
         }
     }
 
-    /// The card's one primary category (`plugins/AGENTS.md`). Bender routes is mixed-purpose and
+    /// The card's one primary category (mxm-kit's `docs/plugin-conventions.md`, *Editor contract*).
+    /// Bender routes is mixed-purpose and
     /// placed by what it decides: the lever's destination depths, including rectified LFO depth,
     /// beside the other destination depths.
     const fn category(self) -> Category {
@@ -304,7 +305,7 @@ pub fn panel(
         ui.ctx().set_theme(preference);
     }
     // This editor has no disclosure: CC 118's request is consumed and changes nothing
-    // (`plugins/AGENTS.md`).
+    // (mxm-kit's `docs/plugin-conventions.md`, *A developer channel in every editor*).
     let _ = telemetry.take_disclosure_request();
 
     let tokens = tokens_for(ui);

@@ -15,9 +15,10 @@ below are in [NOTES.md](NOTES.md#status).
 
 # Ownership
 
-Owns `BASELINE-C0.md`, `Cargo.toml`, `LICENSE`, `README.md`, `control-map.json`, `presets/` and
-`src/`. DSP remains in the framework-free sibling crate; shared preset behaviour remains in
-`mxm-preset`.
+Owns `BASELINE-C0.md`, `Cargo.toml`, `README.md`, `control-map.json`, `presets/`, `src/` and
+`host-tests/`; its licence is the repository's root `LICENSE` (there is no per-plugin `LICENSE`
+since the split, 2026-10-06). DSP remains in the framework-free sibling crate; shared preset
+behaviour remains in mxm-kit's `mxm-preset`.
 
 - **`BASELINE-C0.md` is the routing conversion's reference** (digests, focused oracles and
   throughput on both source paths), produced by `lib.rs`'s `#[ignore]`d `baseline` module.
@@ -158,15 +159,15 @@ Detail: [NOTES.md § Control map](NOTES.md#control-map-and-absent-effects).
 cargo test -p mxm-para-07
 # Every page, light and dark, for review -> target/layout-tree/mxm-para-07/<MXM_PICTURES tag>/
 MXM_PICTURES=after cargo test -p mxm-para-07 --lib tree_pictures -- --ignored
-cargo test -p mxm-player --test t5_control_map
+cargo test -p mxm-player --test t5_control_map  # in the mxm-player repository; this plugin's map is held by host-tests' behaviour
 cargo clippy -p mxm-para-07 --all-targets -- -D warnings
 cargo xtask bundle mxm-para-07
 clap-validator validate "target/bundled/mxm-para-07.clap"
 cargo xtask bundle mxm-para-07 --release
 clap-validator validate "target/bundled/mxm-para-07.clap"
 cargo test -p mxm-para-07-host-tests      # behaviour and golden_audio, through MXM Player
-cargo test -p mxm-player --test t7_editor
-cargo test -p mxm-player --test t7_editor -- --ignored --nocapture # real window, deliberate
+cargo test -p mxm-player --test t7_editor      # in the mxm-player repository
+cargo test -p mxm-player --test t7_editor -- --ignored --nocapture # there too; real window, deliberate
 ```
 
 - Debug validation is mandatory because `assert_process_allocs` is debug-only. Bundle before player

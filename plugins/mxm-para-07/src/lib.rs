@@ -915,7 +915,7 @@ mod baseline {
     const BLOCK: usize = 512;
 
     /// A plugin with every smoother activated and the voice armed, exactly as `activate` leaves it
-    /// (`docs/adding-an-instrument.md` gotcha 13).
+    /// (mxm-kit's `docs/adding-an-instrument.md` gotcha 13).
     pub(crate) fn plugin() -> MxmPara07 {
         let mut plugin = MxmPara07::default();
         for (_, ptr, _) in plugin.params.param_map() {

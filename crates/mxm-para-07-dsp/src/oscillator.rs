@@ -591,7 +591,7 @@ mod tests {
 
     #[test]
     fn divider_saw_alias_rejection_keeps_the_wanted_spectrum() {
-        // Exactly periodic frequency as docs/oscillators/06-testing.md requires.
+        // Exactly periodic frequency as mxm-kit's docs/oscillators/06-testing.md requires.
         let (n, periods, fs) = (1024usize, 11usize, 48_000.0f32);
         let hz = periods as f32 * fs / n as f32;
         let mut v = Vco::new(fs);

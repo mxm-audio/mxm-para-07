@@ -36,8 +36,9 @@ pub struct Telemetry {
     scope_out: Box<[AtomicU32]>,
     /// How many points have been written; the next goes at this modulo [`SCOPE_LEN`].
     scope_head: AtomicUsize,
-    /// Whether an editor exists to read the scope. `plugins/AGENTS.md`: visualization work stops
-    /// while the editor is closed, so the audio thread fills the rings only while this is set.
+    /// Whether an editor exists to read the scope. Visualization work stops while the editor is
+    /// closed (mxm-kit's `docs/MXM_DESIGN_SYSTEM.md` §15), so the audio thread fills the rings only
+    /// while this is set.
     editor_open: AtomicBool,
     dev_view: AtomicU8,
     dev_disclosure: AtomicU8,

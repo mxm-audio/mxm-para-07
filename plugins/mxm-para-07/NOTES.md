@@ -178,7 +178,9 @@ whichever card is requested.
 
 ### Pages
 
-`mxm_ui::paging::editor` derives the pages from width and height (`plugins/AGENTS.md`): there is no
+`mxm_ui::paging::editor` derives the pages from width and height (mxm-kit's
+[`docs/plugin-conventions.md`](https://github.com/mxm-audio/mxm-kit/blob/main/docs/plugin-conventions.md#editor-contract),
+*Editor contract*): there is no
 authored page assignment and no bar for one page. Envelope 1/2 and Oscillator 1/2 are the
 same-category preferred groups. The renderer is the only scroll owner — do not wrap it in another
 `ScrollArea`, which hid the real viewport from reflow and made native resize lag and jump in the
@@ -194,7 +196,9 @@ the control does to the sound, never the circuit's vocabulary.
 
 ### Card bodies and the displays
 
-**Every card is a `mxm_ui::tree`** (`crates/ui/AGENTS.md`, *A card body as data*).
+**Every card is a `mxm_ui::tree`** (mxm-kit's
+[`crates/ui/AGENTS.md`](https://github.com/mxm-audio/mxm-kit/blob/main/crates/ui/AGENTS.md), *A card
+body as data*).
 `sections::card` describes a card's body once and that one description is measured for the card's
 floor and height and drawn leaf by leaf through the same bindings (`sections::paint`); the paged
 view is `paging::editor::show`. **Floors are computed**, and each card is exactly as wide as its
@@ -234,7 +238,7 @@ panel). When the LFO Rate and Sample time began showing their readings (below) t
 cards widened by about ten points and the top row of seven no longer fitted; **the envelopes'
 trigger reads *Gate + trig***, as mxm-mono-02's does (the owner, the same day), which narrows both
 envelope cards and puts it back on one page. A whole category never
-costs a page (`crates/ui/AGENTS.md`). Its minimum holds one widest card plus
+costs a page (mxm-kit's `crates/ui/AGENTS.md`). Its minimum holds one widest card plus
 workspace gutters (`MINIMUM`, held by `the_window_minimum_holds_one_widest_card_and_its_gutters`), and
 the app bar at its last compact step is wider and sets it (`the_app_bar_holds_in_the_minimum_window`).
 `every_dynamic_page_fits_and_every_card_is_reachable`
@@ -253,8 +257,8 @@ mxm-mono-00's do; `sections::knob_size`, held by
 the others' values remain available through hover/focus and direct entry. The app bar owns presets,
 the latched level/clip meter, the master Volume and the collection's `mxm_ui::shell::zoom_control`
 and `editor_theme_control`; the opening theme is `mxm_ui::theme::preference`. Leaf green is
-`mxm_ui::theme::LEAF_GREEN`, owned and contrast-tested by `crates/ui`; this crate contains no colour
-literal.
+`mxm_ui::theme::LEAF_GREEN`, owned and contrast-tested by mxm-kit's `crates/ui`; this crate contains
+no colour literal.
 
 ### The keyboard cursor and the write funnel
 
@@ -309,3 +313,6 @@ byte-for-byte ten-page player standard at software commit `68e3f82`, frozen ther
 current standard cannot masquerade as backward-compatibility proof; `behaviour` holds this
 instrument's map to both it and the current standard. The design-system §15 visual review and
 real-DAW parenting/resize remain manual; Linux, macOS and hardware comparison remain unverified.
+*Since the split (2026-10-06):* CI builds and tests Windows, macOS and Linux on `v*` release tags or
+when started by hand, and Linux is checked in WSL before a push (root `AGENTS.md`, *Verification*);
+hardware comparison remains unverified.

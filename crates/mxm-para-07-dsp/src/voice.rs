@@ -746,8 +746,8 @@ impl Voice {
 
     /// Whether a route exists at a depth that can carry anything.
     ///
-    /// **A route at zero depth carries nothing** (`docs/code-review-notes.md` §7): it neither keeps
-    /// the plugin live nor owns a tail.
+    /// **A route at zero depth carries nothing** (mxm-kit's `docs/code-review-notes.md` §7): it
+    /// neither keeps the plugin live nor owns a tail.
     fn reaches(&self, target: usize, source: usize) -> bool {
         self.routing.present[target][source] && self.routing.amounts[target][source] != 0.0
     }

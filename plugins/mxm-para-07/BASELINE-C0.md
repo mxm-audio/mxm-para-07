@@ -27,7 +27,8 @@ Either way, a figure taken here is a figure the host pays.
 ## The score
 
 Seventy-two blocks of 512 frames, the host golden's own shape
-(`apps/mxm-player/tests/t4_golden_audio_para_07.rs`), so the two measure the same gestures: a low
+(`apps/mxm-player/tests/t4_golden_audio_para_07.rs` then; *since 2026-10-05,*
+`host-tests/tests/golden_audio.rs` beside this file), so the two measure the same gestures: a low
 press, a high press above it, a middle press that moves the shared gate but neither pitch, then the
 extremes released in the order that collapses ownership. That is the two-pitch story this machine
 exists to tell.

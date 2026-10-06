@@ -186,7 +186,8 @@ one-sided pulse range or coupling the two sections.
 
 ## 6. Views
 
-**Space-derived pages**, following design-system §3.2 and `plugins/AGENTS.md`. Each card has one
+**Space-derived pages**, following design-system §3.2 and `plugins/AGENTS.md` (since the split,
+2026-10-06, mxm-kit's [`docs/plugin-conventions.md`](https://github.com/mxm-audio/mxm-kit/blob/main/docs/plugin-conventions.md#editor-contract)). Each card has one
 primary category, and the window's width and height decide the pages rather than an authored page
 assignment:
 
@@ -215,8 +216,8 @@ behaviour, not a step sequencer.
 
 ## 7. Identity accent
 
-**Leaf green**, owned by `crates/ui` as a semantic `mxm-ui` identity token rather than colour
-literals in this plugin. The proposed token resolves to dark `#63CF63` and light `#2F692F`; the
+**Leaf green**, owned by mxm-kit's `crates/ui` as a semantic `mxm-ui` identity token rather than
+colour literals in this plugin. The proposed token resolves to dark `#63CF63` and light `#2F692F`; the
 shared theme tests must pin both values' contrast and must verify that applying the identity leaves
 modulation and status colours unchanged. The editor consumes only that token.
 
@@ -365,8 +366,9 @@ an oversampled rendering is the reference. Under matched fundamental/output leve
 materially outperform a deliberately trivial/base-rate generator, or meet an independently audited
 rejection bound, **without** buying that result by dulling the wanted high-frequency content. Exact
 margins and measurement windows are fixed during implementation from the baseline/reference
-comparison with headroom against both failure modes, following `docs/oscillators/06-testing.md`
-§6.4 and `docs/oscillators/AGENTS.md`; oversampling choices and calibration values are measured and
+comparison with headroom against both failure modes, following mxm-kit's
+[`docs/oscillators/06-testing.md`](https://github.com/mxm-audio/mxm-kit/blob/main/docs/oscillators/06-testing.md)
+§6.4 and [`docs/oscillators/AGENTS.md`](https://github.com/mxm-audio/mxm-kit/blob/main/docs/oscillators/AGENTS.md); oversampling choices and calibration values are measured and
 documented beside the model rather than invented in this brief. The candidate's measurements alone
 cannot set either half of the alias gate. Structural
 host tests, not an audio score, prove that no note-output port or emitted note event exists; separate

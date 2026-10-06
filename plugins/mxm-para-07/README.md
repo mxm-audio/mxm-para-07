@@ -40,4 +40,5 @@ cargo xtask bundle mxm-para-07 --release
 clap-validator validate "target/bundled/mxm-para-07.clap"
 ```
 
-MIT licensed — see [LICENSE](LICENSE). All implementation code is original.
+GPL-3.0-or-later — see the repository's [`LICENSE`](../../LICENSE). All implementation code is
+original.

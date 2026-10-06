@@ -5,7 +5,7 @@
 Framework-free DSP for `mxm-para-07`: two keyed pitches through one shared mixer, HPF, resonant
 low-pass, dual envelopes and VCA. It implements the Roland SH-7's function without using that
 identity as the product name. Hardware evidence is `research:instruments/sh-7.md`; product decisions
-are `docs/briefs/mxm-para-07.md` and `plans/plan-mxm-para-07.md`.
+are `docs/briefs/mxm-para-07.md` and `plans/plan-mxm-para-07.md` (in the private archive).
 
 MSRV is Rust 1.87. This crate owns the complete audio machine, tests, measurement harness and render
 demo. It has no plugin-framework or UI concerns and **one runtime dependency**,
