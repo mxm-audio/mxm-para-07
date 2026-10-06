@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "_comment": [
+    "Which mxm-para-07 parameters fill the collection's existing control roles.",
+    "Only roles already present in docs/MXM_CONTROL_MAP.md are used; ids are permanent.",
+    "Envelope 1 fills Filter because it is the only envelope with that route.",
+    "Amp roles stay empty because vcaenv can select either envelope; no static mapping is correct",
+    "for every saved selector state. Both envelopes remain available to automation.",
+    "S&H timing, separate per-oscillator pitch modulation, audio-rate filter modulation,",
+    "Gate source, Trigger input, the pedal route, continuous HPF and mode-dependent modulation",
+    "amounts are intentionally unmapped.",
+    "Since the routing conversion the pwm_source roles are unfilled, the source switch having",
+    "become two routes, and filter_env.polarity is unfilled because the polarity is the sign of",
+    "the (Cutoff from Envelope 1) route amount -- as mxm-mono-02 and mxm-poly-06 already record.",
+    "pwm_depth, key_track and to_amp name route amounts Init wires, so no role is dead.",
+    "There is no effect mapping because this instrument contains no effect."
+  ],
+  "instruments": [
+    {
+      "clap_id": "dk.mxm.mxm-para-07",
+      "name": "mxm-para-07",
+      "params": {
+        "osc1.range": "vco1range",
+        "osc1.tune": "tune",
+        "osc1.wave": "vco1wave",
+        "osc1.pulse_width": "vco1width",
+        "osc1.pwm_depth": "mod_vco1pw_lfotri",
+
+        "osc2.range": "vco2range",
+        "osc2.tune": "vco2tune",
+        "osc2.wave": "vco2wave",
+        "osc2.pulse_width": "vco2width",
+        "osc2.pwm_depth": "mod_vco2pw_lfotri",
+        "osc2.sync": "sync",
+
+        "mixer.src1": "vco1",
+        "mixer.src2": "vco2",
+        "mixer.src3": "bank",
+        "mixer.src4": "fifth",
+        "mixer.noise": "noise",
+
+        "filter.cutoff": "cutoff",
+        "filter.resonance": "resonance",
+        "filter.key_track": "mod_cutoff_key",
+
+        "filter_env.attack": "env1attack",
+        "filter_env.decay": "env1decay",
+        "filter_env.sustain": "env1sustain",
+        "filter_env.release": "env1release",
+
+        "lfo1.rate": "lforate",
+        "lfo1.shape": "lfoshape",
+        "lfo1.to_amp": "mod_amp_lfoc",
+        "lfo1.delay": "lfodelay",
+
+        "voice.glide": "portamento",
+        "voice.output": "volume"
+      }
+    }
+  ]
+}

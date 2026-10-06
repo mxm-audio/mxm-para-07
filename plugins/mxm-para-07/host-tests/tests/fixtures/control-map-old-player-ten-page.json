@@ -1,0 +1,421 @@
+{
+ "schema_version": 1,
+ "_comment": [
+  "The MXM Synth Collection control map. Normative contract: docs/MXM_CONTROL_MAP.md.",
+  "Roles are permanent. Pages append, never insert. Parameter references are string",
+  "parameter ids (hashed the way nice-plug hashes them) or raw numeric CLAP ids."
+ ],
+ "roles": {
+  "osc1.range": {
+   "curve": "stepped"
+  },
+  "osc1.tune": {
+   "curve": "bipolar"
+  },
+  "osc1.wave": {
+   "curve": "stepped"
+  },
+  "osc1.pulse_width": {
+   "curve": "linear"
+  },
+  "osc1.pwm_source": {
+   "curve": "stepped"
+  },
+  "osc1.pwm_depth": {
+   "curve": "linear"
+  },
+  "osc2.range": {
+   "curve": "stepped"
+  },
+  "osc2.tune": {
+   "curve": "bipolar"
+  },
+  "osc2.wave": {
+   "curve": "stepped"
+  },
+  "osc2.pulse_width": {
+   "curve": "linear"
+  },
+  "osc2.pwm_source": {
+   "curve": "stepped"
+  },
+  "osc2.pwm_depth": {
+   "curve": "linear"
+  },
+  "osc2.sync": {
+   "curve": "stepped"
+  },
+  "osc2.detune": {
+   "curve": "bipolar"
+  },
+  "mixer.src1": {
+   "curve": "linear"
+  },
+  "mixer.src2": {
+   "curve": "linear"
+  },
+  "mixer.src3": {
+   "curve": "linear"
+  },
+  "mixer.src4": {
+   "curve": "linear"
+  },
+  "mixer.sub_level": {
+   "curve": "linear"
+  },
+  "mixer.sub_shape": {
+   "curve": "stepped"
+  },
+  "mixer.noise": {
+   "curve": "linear"
+  },
+  "filter.cutoff": {
+   "curve": "log"
+  },
+  "filter.resonance": {
+   "curve": "linear"
+  },
+  "filter.env_amount": {
+   "curve": "bipolar"
+  },
+  "filter.key_track": {
+   "curve": "linear"
+  },
+  "filter.lfo_amount": {
+   "curve": "linear"
+  },
+  "filter.drive": {
+   "curve": "linear"
+  },
+  "filter.mode": {
+   "curve": "stepped"
+  },
+  "filter.hpf": {
+   "curve": "stepped"
+  },
+  "amp_env.attack": {
+   "curve": "log"
+  },
+  "amp_env.decay": {
+   "curve": "log"
+  },
+  "amp_env.sustain": {
+   "curve": "linear"
+  },
+  "amp_env.release": {
+   "curve": "log"
+  },
+  "amp_env.trigger": {
+   "curve": "stepped"
+  },
+  "filter_env.attack": {
+   "curve": "log"
+  },
+  "filter_env.decay": {
+   "curve": "log"
+  },
+  "filter_env.sustain": {
+   "curve": "linear"
+  },
+  "filter_env.release": {
+   "curve": "log"
+  },
+  "filter_env.polarity": {
+   "curve": "stepped"
+  },
+  "lfo1.rate": {
+   "curve": "log"
+  },
+  "lfo1.shape": {
+   "curve": "stepped"
+  },
+  "lfo1.to_pitch": {
+   "curve": "linear"
+  },
+  "lfo1.to_filter": {
+   "curve": "linear"
+  },
+  "lfo1.to_amp": {
+   "curve": "linear"
+  },
+  "lfo1.delay": {
+   "curve": "log"
+  },
+  "lfo1.sync": {
+   "curve": "stepped"
+  },
+  "voice.glide": {
+   "curve": "log"
+  },
+  "voice.bend_range": {
+   "curve": "stepped"
+  },
+  "voice.note_priority": {
+   "curve": "stepped"
+  },
+  "voice.vca_source": {
+   "curve": "stepped"
+  },
+  "voice.output": {
+   "curve": "linear"
+  },
+  "voice.accent": {
+   "curve": "linear"
+  },
+  "voice.slide": {
+   "curve": "linear"
+  },
+  "voice.accent_depth": {
+   "curve": "linear"
+  },
+  "fx.chorus": {
+   "curve": "stepped"
+  },
+  "fx.phaser": {
+   "curve": "linear"
+  },
+  "fx.delay": {
+   "curve": "linear"
+  },
+  "fx.reverb": {
+   "curve": "linear"
+  },
+  "fx.chorus_rate": {
+   "curve": "log"
+  },
+  "fx.chorus_depth": {
+   "curve": "linear"
+  },
+  "fx.chorus_mix": {
+   "curve": "linear"
+  },
+  "lfo2.rate": {
+   "curve": "log"
+  },
+  "lfo2.shape": {
+   "curve": "stepped"
+  }
+ },
+ "fixed": [
+  {
+   "cc": 74,
+   "role": "filter.cutoff"
+  },
+  {
+   "cc": 71,
+   "role": "filter.resonance"
+  },
+  {
+   "cc": 73,
+   "role": "amp_env.attack"
+  },
+  {
+   "cc": 75,
+   "role": "amp_env.decay"
+  },
+  {
+   "cc": 72,
+   "role": "amp_env.release"
+  },
+  {
+   "cc": 5,
+   "role": "voice.glide"
+  },
+  {
+   "cc": 76,
+   "role": "lfo1.rate"
+  },
+  {
+   "cc": 77,
+   "role": "lfo1.to_pitch"
+  },
+  {
+   "cc": 14,
+   "role": "filter.cutoff"
+  },
+  {
+   "cc": 15,
+   "role": "filter.resonance"
+  },
+  {
+   "cc": 16,
+   "role": "amp_env.attack"
+  },
+  {
+   "cc": 17,
+   "role": "amp_env.decay"
+  },
+  {
+   "cc": 18,
+   "role": "amp_env.release"
+  },
+  {
+   "cc": 19,
+   "role": "voice.glide"
+  },
+  {
+   "cc": 20,
+   "role": "lfo1.rate"
+  },
+  {
+   "cc": 21,
+   "role": "lfo1.to_pitch"
+  }
+ ],
+ "bank": {
+  "slot_cc": [
+   102,
+   103,
+   104,
+   105,
+   106,
+   107,
+   108,
+   109
+  ],
+  "page_down_cc": 110,
+  "page_up_cc": 111
+ },
+ "pages": [
+  {
+   "section": "Oscillator",
+   "name": "Osc 1",
+   "slots": [
+    "osc1.range",
+    "osc1.tune",
+    "osc1.wave",
+    "osc1.pulse_width",
+    "osc1.pwm_source",
+    "osc1.pwm_depth",
+    null,
+    null
+   ]
+  },
+  {
+   "section": "Oscillator",
+   "name": "Osc 2",
+   "slots": [
+    "osc2.range",
+    "osc2.tune",
+    "osc2.wave",
+    "osc2.pulse_width",
+    "osc2.pwm_source",
+    "osc2.pwm_depth",
+    "osc2.sync",
+    "osc2.detune"
+   ]
+  },
+  {
+   "section": "Mixer",
+   "name": "Mixer",
+   "slots": [
+    "mixer.src1",
+    "mixer.src2",
+    "mixer.src3",
+    "mixer.src4",
+    "mixer.sub_level",
+    "mixer.sub_shape",
+    "mixer.noise",
+    null
+   ]
+  },
+  {
+   "section": "Filter",
+   "name": "Filter",
+   "slots": [
+    "filter.cutoff",
+    "filter.resonance",
+    "filter.env_amount",
+    "filter.key_track",
+    "filter.lfo_amount",
+    "filter.drive",
+    "filter.mode",
+    "filter.hpf"
+   ]
+  },
+  {
+   "section": "Envelope",
+   "name": "Amp",
+   "slots": [
+    "amp_env.attack",
+    "amp_env.decay",
+    "amp_env.sustain",
+    "amp_env.release",
+    "amp_env.trigger",
+    null,
+    null,
+    null
+   ]
+  },
+  {
+   "section": "Envelope",
+   "name": "Filter",
+   "slots": [
+    "filter_env.attack",
+    "filter_env.decay",
+    "filter_env.sustain",
+    "filter_env.release",
+    "filter_env.polarity",
+    null,
+    null,
+    null
+   ]
+  },
+  {
+   "section": "LFO",
+   "name": "LFO 1",
+   "slots": [
+    "lfo1.rate",
+    "lfo1.shape",
+    "lfo1.to_pitch",
+    "lfo1.to_filter",
+    "lfo1.to_amp",
+    "lfo1.delay",
+    "lfo1.sync",
+    null
+   ]
+  },
+  {
+   "section": "Voice",
+   "name": "Voice",
+   "slots": [
+    "voice.glide",
+    "voice.bend_range",
+    "voice.note_priority",
+    "voice.vca_source",
+    "voice.output",
+    "voice.accent_depth",
+    "voice.accent",
+    "voice.slide"
+   ]
+  },
+  {
+   "section": "Effects",
+   "name": "Chorus",
+   "slots": [
+    "fx.chorus",
+    "fx.phaser",
+    "fx.delay",
+    "fx.reverb",
+    "fx.chorus_rate",
+    "fx.chorus_depth",
+    "fx.chorus_mix",
+    null
+   ]
+  },
+  {
+   "section": "LFO",
+   "name": "LFO 2",
+   "slots": [
+    "lfo2.rate",
+    "lfo2.shape",
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  }
+ ]
+}

@@ -1,0 +1,38 @@
+[package]
+name = "mxm-para-07"
+description = "Two-pitch paraphonic subtractive synthesizer with one shared articulation path"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+nice-plug.workspace = true
+nice-plug-egui.workspace = true
+mxm-ui.workspace = true
+mxm-preset.workspace = true
+mxm-tempo.workspace = true
+egui.workspace = true
+mxm-para-07-dsp.workspace = true
+mxm-modulation-params.workspace = true
+# `standard::Offer`: which pairs a target registers at all (`src/routes.rs`).
+mxm-modulation.workspace = true
+
+[dev-dependencies]
+# The collection's shared headless checks (`crates/mxm-plugin-test`).
+mxm-plugin-test.workspace = true
+# `wgpu` renders a frame to pixels for the layout-tree review pictures
+# (`mxm_plugin_test::tree_checks`, `editor::tests::tree_pictures`). Test-only: nothing here reaches
+# the bundle.
+egui_kittest = { version = "=0.36.1", features = ["wgpu"] }
+image = { version = "=0.25.9", default-features = false, features = ["png"] }
+kittest = "=0.4.0"
+# The modulation standard's checks (`mxm_plugin_test::routing_checks`): the route parameters are
+# held to the DSP's own declaration. Test-only features, so the bundle carries neither.
+mxm-modulation = { workspace = true, features = ["conformance"] }
+mxm-para-07-dsp = { workspace = true, features = ["conformance"] }

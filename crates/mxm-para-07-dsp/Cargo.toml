@@ -1,0 +1,28 @@
+[package]
+name = "mxm-para-07-dsp"
+description = "DSP for mxm-para-07, framework-free and unit-testable"
+version.workspace = true
+edition.workspace = true
+# One runtime dependency, itself dependency-free and below this floor: the collection's shared
+# routing (`crates/mxm-modulation`). This framework-free crate therefore stays below the GUI floor;
+# `cargo tree` is the check.
+rust-version = "1.87"
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[dependencies]
+mxm-modulation.workspace = true
+
+[features]
+# `src/conformance.rs`: this instrument's routing as the modulation standard checks it. Enable it
+# only from `[dev-dependencies]` — the plugin's tests hold its route readings to it — so no shipped
+# graph carries it.
+conformance = ["mxm-modulation/conformance"]
+
+[dev-dependencies]
+# The modulation standard's checks, for this crate's own tests (`src/conformance.rs`).
+mxm-modulation = { workspace = true, features = ["conformance"] }
+# The listening demo writes through the collection's encoder. A test-only edge, so the shipped
+# graph carries only the routing.
+mxm-audio-file.workspace = true
