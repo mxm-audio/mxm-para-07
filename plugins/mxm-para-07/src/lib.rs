@@ -25,9 +25,22 @@ use mxm_para_07_dsp::MIN_SAMPLE_RATE;
 use mxm_para_07_dsp::keyboard::NoteId;
 use mxm_para_07_dsp::routing::Routing;
 use mxm_para_07_dsp::voice::{Activity, EnvelopePatch, OscPatch, Patch, Voice};
+use nice_plug::midi::{Channel, Key, VoiceID};
 use nice_plug::prelude::*;
 use params::MxmPara07Params;
 use std::sync::Arc;
+
+/// A note's identity in the shape the voice logic was written for. nice-plug 0.4 types it
+/// (`VoiceID`, `Channel`, `Key`, each with a wildcard); 0.3 handed over a host's wildcard (-1) as
+/// 255 and a missing voice id as `None`. Converting here keeps every note decision, and every
+/// recorded render, exactly what it was before the upgrade.
+fn legacy_note(voice_id: VoiceID, channel: Channel, key: Key) -> (Option<i32>, u8, u8) {
+    (
+        voice_id.id(),
+        channel.number().unwrap_or(u8::MAX),
+        key.number().unwrap_or(u8::MAX),
+    )
+}
 
 const MAX_BLOCK_SIZE: usize = 64;
 const DEV_VIEW_CC: u8 = 119;
@@ -167,10 +180,11 @@ impl MxmPara07 {
             NoteEvent::NoteOn {
                 voice_id,
                 channel,
-                note,
+                key,
                 velocity,
                 ..
             } => {
+                let (voice_id, channel, note) = legacy_note(voice_id, channel, key);
                 if velocity <= 0.0 {
                     self.voice.note_off(voice_id, channel, note);
                 } else {
@@ -187,26 +201,29 @@ impl MxmPara07 {
             NoteEvent::NoteOff {
                 voice_id,
                 channel,
-                note,
+                key,
                 ..
             } => {
+                let (voice_id, channel, note) = legacy_note(voice_id, channel, key);
                 self.voice.note_off(voice_id, channel, note);
             }
             NoteEvent::Choke {
                 voice_id,
                 channel,
-                note,
+                key,
                 ..
             } => {
+                let (voice_id, channel, note) = legacy_note(voice_id, channel, key);
                 self.voice.choke(voice_id, channel, note);
             }
             NoteEvent::PolyTuning {
                 voice_id,
                 channel,
-                note,
+                key,
                 tuning,
                 ..
             } => {
+                let (voice_id, channel, note) = legacy_note(voice_id, channel, key);
                 self.voice.set_poly_tuning(voice_id, channel, note, tuning);
             }
             NoteEvent::MidiPitchBend { channel, value, .. } => {
@@ -679,9 +696,9 @@ mod tests {
         let mut p = MxmPara07::default();
         let on = |note, channel| NoteEvent::NoteOn {
             timing: 0,
-            voice_id: None,
-            channel,
-            note,
+            voice_id: VoiceID::Wildcard,
+            channel: Channel::Number(channel),
+            key: Key::Number(note),
             velocity: 1.0,
         };
         p.handle_event(on(48, 1));
@@ -691,9 +708,9 @@ mod tests {
         assert_eq!(a.low.unwrap().id.key, 48);
         p.handle_event(NoteEvent::PolyTuning {
             timing: 0,
-            voice_id: None,
-            channel: 2,
-            note: 72,
+            voice_id: VoiceID::Wildcard,
+            channel: Channel::Number(2),
+            key: Key::Number(72),
             tuning: 0.5,
         });
         assert_eq!(p.voice.assignment().high.unwrap().tuning_semitones, 0.5);
@@ -987,9 +1004,9 @@ mod baseline {
     fn note_on(plugin: &mut MxmPara07, note: u8) {
         plugin.handle_event(NoteEvent::NoteOn {
             timing: 0,
-            voice_id: None,
-            channel: 0,
-            note,
+            voice_id: VoiceID::Wildcard,
+            channel: Channel::Number(0),
+            key: Key::Number(note),
             velocity: 1.0,
         });
     }
@@ -997,9 +1014,9 @@ mod baseline {
     fn note_off(plugin: &mut MxmPara07, note: u8) {
         plugin.handle_event(NoteEvent::NoteOff {
             timing: 0,
-            voice_id: None,
-            channel: 0,
-            note,
+            voice_id: VoiceID::Wildcard,
+            channel: Channel::Number(0),
+            key: Key::Number(note),
             velocity: 0.0,
         });
     }
