@@ -7,9 +7,7 @@
 
 use mxm_para_07_dsp::voice::Telemetry as VoiceTelemetry;
 use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, AtomicU8, AtomicU32, AtomicUsize, Ordering};
-
-const NO_REQUEST: u8 = u8::MAX;
+use std::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
 
 /// The scope's points a second: one a millisecond, forty to a cycle of the fastest LFO (25 Hz) and
 /// a clean edge on the shortest sample time (13 ms), whatever the host's sample rate.
@@ -19,8 +17,12 @@ pub const SCOPE_LEN: usize = 8192;
 
 #[derive(Debug)]
 pub struct Telemetry {
-    peak: AtomicU32,
-    clipped: AtomicBool,
+    /// The output level and its clip latch: the collection's one meter policy
+    /// (`mxm_telemetry::PeakMeter`).
+    pub meter: mxm_telemetry::PeakMeter,
+    /// The developer channel's requests of the editor, each taken once
+    /// (`mxm_telemetry::DevRequests`).
+    pub dev: mxm_telemetry::DevRequests,
     overloaded: AtomicBool,
     /// Whether a note sounds — live or in its tail — as of the last block, for the displays that
     /// show where the voice is now.
@@ -40,10 +42,6 @@ pub struct Telemetry {
     /// closed (mxm-kit's `docs/MXM_DESIGN_SYSTEM.md` §15), so the audio thread fills the rings only
     /// while this is set.
     editor_open: AtomicBool,
-    dev_view: AtomicU8,
-    dev_disclosure: AtomicU8,
-    dev_browser: AtomicU8,
-    dev_theme: AtomicU8,
     /// The host tempo in force, so a synced LFO rate or sample time reads its division.
     pub tempo: mxm_tempo::TempoCell,
 }
@@ -56,8 +54,8 @@ impl Default for Telemetry {
 impl Telemetry {
     pub fn new() -> Self {
         Self {
-            peak: AtomicU32::new(0),
-            clipped: AtomicBool::new(false),
+            meter: mxm_telemetry::PeakMeter::new(),
+            dev: mxm_telemetry::DevRequests::new(),
             overloaded: AtomicBool::new(false),
             sounding: AtomicBool::new(false),
             sample_rate: AtomicU32::new(48_000.0f32.to_bits()),
@@ -68,31 +66,14 @@ impl Telemetry {
             scope_out: (0..SCOPE_LEN).map(|_| AtomicU32::new(0)).collect(),
             scope_head: AtomicUsize::new(0),
             editor_open: AtomicBool::new(false),
-            dev_view: AtomicU8::new(NO_REQUEST),
-            dev_disclosure: AtomicU8::new(NO_REQUEST),
-            dev_browser: AtomicU8::new(NO_REQUEST),
-            dev_theme: AtomicU8::new(NO_REQUEST),
             tempo: mxm_tempo::TempoCell::new(),
         }
     }
     pub fn shared() -> Arc<Self> {
         Arc::new(Self::new())
     }
-    fn max_store(slot: &AtomicU32, value: f32) {
-        let mut current = slot.load(Ordering::Relaxed);
-        loop {
-            let next = f32::from_bits(current).max(value).to_bits();
-            match slot.compare_exchange_weak(current, next, Ordering::Relaxed, Ordering::Relaxed) {
-                Ok(_) => break,
-                Err(seen) => current = seen,
-            }
-        }
-    }
     pub fn publish_block(&self, peak: f32, voice: VoiceTelemetry) {
-        Self::max_store(&self.peak, peak);
-        if peak >= 1.0 {
-            self.clipped.store(true, Ordering::Relaxed);
-        }
+        self.meter.publish(peak);
         if voice.overload {
             self.overloaded.store(true, Ordering::Relaxed);
         }
@@ -146,17 +127,8 @@ impl Telemetry {
     pub fn publish_sample_rate(&self, rate: f32) {
         self.sample_rate.store(rate.to_bits(), Ordering::Relaxed);
     }
-    pub fn take_peak(&self) -> f32 {
-        f32::from_bits(self.peak.swap(0, Ordering::Relaxed))
-    }
-    pub fn clipped(&self) -> bool {
-        self.clipped.load(Ordering::Relaxed)
-    }
     pub fn overloaded(&self) -> bool {
         self.overloaded.load(Ordering::Relaxed)
-    }
-    pub fn clear_clip(&self) {
-        self.clipped.store(false, Ordering::Relaxed);
     }
     pub fn clear_overload(&self) {
         self.overloaded.store(false, Ordering::Relaxed);
@@ -168,46 +140,6 @@ impl Telemetry {
     pub fn voice_snapshot(&self) -> [f32; 3] {
         [&self.cutoff_hz, &self.vco1_hz, &self.vco2_hz]
             .map(|v| f32::from_bits(v.load(Ordering::Relaxed)))
-    }
-
-    pub fn request_view(&self, view: u8) {
-        self.dev_view
-            .store(view.min(NO_REQUEST - 1), Ordering::Relaxed);
-    }
-    pub fn request_disclosure(&self, open: bool) {
-        self.dev_disclosure.store(u8::from(open), Ordering::Relaxed);
-    }
-    pub fn request_browser(&self, open: bool) {
-        self.dev_browser.store(u8::from(open), Ordering::Relaxed);
-    }
-    pub fn take_view_request(&self) -> Option<usize> {
-        match self.dev_view.swap(NO_REQUEST, Ordering::Relaxed) {
-            NO_REQUEST => None,
-            v => Some(v as usize),
-        }
-    }
-    pub fn take_disclosure_request(&self) -> Option<bool> {
-        match self.dev_disclosure.swap(NO_REQUEST, Ordering::Relaxed) {
-            NO_REQUEST => None,
-            v => Some(v != 0),
-        }
-    }
-    pub fn take_browser_request(&self) -> Option<bool> {
-        match self.dev_browser.swap(NO_REQUEST, Ordering::Relaxed) {
-            NO_REQUEST => None,
-            v => Some(v != 0),
-        }
-    }
-    /// A theme by index — 0 light, 1 dark, 2 system, as `mxm_ui::theme::from_index` reads it.
-    pub fn request_theme(&self, theme: u8) {
-        self.dev_theme
-            .store(theme.min(NO_REQUEST - 1), Ordering::Relaxed);
-    }
-    pub fn take_theme_request(&self) -> Option<u8> {
-        match self.dev_theme.swap(NO_REQUEST, Ordering::Relaxed) {
-            NO_REQUEST => None,
-            theme => Some(theme),
-        }
     }
 }
 
@@ -223,12 +155,12 @@ mod tests {
             ..VoiceTelemetry::default()
         };
         t.publish_block(1.1, v);
-        assert_eq!(t.take_peak(), 1.1);
-        assert_eq!(t.take_peak(), 0.0);
-        assert!(t.clipped() && t.overloaded());
-        t.clear_clip();
+        assert_eq!(t.meter.take(), 1.1);
+        assert_eq!(t.meter.take(), 0.0);
+        assert!(t.meter.clipped() && t.overloaded());
+        t.meter.clear_clip();
         t.clear_overload();
-        assert!(!t.clipped() && !t.overloaded());
+        assert!(!t.meter.clipped() && !t.overloaded());
     }
     /// **The scope keeps the latest points, oldest first**, across the ring's wrap, and shows
     /// only what has been written.
@@ -257,20 +189,5 @@ mod tests {
         t.scope_recent(usize::MAX, &mut source, &mut out);
         assert_eq!(source.len(), SCOPE_LEN, "never more than the ring holds");
         assert_eq!(source[0], last - (SCOPE_LEN - 1) as f32);
-    }
-    #[test]
-    fn developer_requests_are_taken_once() {
-        let t = Telemetry::new();
-        t.request_view(2);
-        t.request_disclosure(true);
-        t.request_browser(false);
-        assert_eq!(t.take_view_request(), Some(2));
-        assert_eq!(t.take_view_request(), None);
-        assert_eq!(t.take_disclosure_request(), Some(true));
-        assert_eq!(t.take_browser_request(), Some(false));
-        // Light is index 0: a request like any other, not the absence of one.
-        t.request_theme(0);
-        assert_eq!(t.take_theme_request(), Some(0));
-        assert_eq!(t.take_theme_request(), None);
     }
 }

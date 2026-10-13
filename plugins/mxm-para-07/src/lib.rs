@@ -234,13 +234,17 @@ impl MxmPara07 {
             } => match cc {
                 DEV_VIEW_CC if self.dev_cc => self
                     .telemetry
+                    .dev
                     .request_view((value.clamp(0.0, 1.0) * 127.0).round() as u8),
-                DEV_DISCLOSURE_CC if self.dev_cc => self.telemetry.request_disclosure(value >= 0.5),
-                DEV_BROWSER_CC if self.dev_cc => self.telemetry.request_browser(value >= 0.5),
+                DEV_DISCLOSURE_CC if self.dev_cc => {
+                    self.telemetry.dev.request_disclosure(value >= 0.5)
+                }
+                DEV_BROWSER_CC if self.dev_cc => self.telemetry.dev.request_browser(value >= 0.5),
                 // A theme by index, 0 light / 1 dark / 2 system: applied to the editor and never
                 // saved, so a capture run cannot rewrite the choice made in the app bar.
                 DEV_THEME_CC if self.dev_cc => self
                     .telemetry
+                    .dev
                     .request_theme((value.clamp(0.0, 1.0) * 127.0).round() as u8),
                 // **New MIDI path.** CC 1 was accepted and ignored because the machine had no mod
                 // wheel; it is kept now because a route can read it, at zero depth until one does.
@@ -753,18 +757,18 @@ mod tests {
         };
         p.handle_event(cc(DEV_VIEW_CC, 2.0 / 127.0));
         p.handle_event(cc(DEV_THEME_CC, 1.0 / 127.0));
-        assert_eq!(p.telemetry.take_view_request(), None);
-        assert_eq!(p.telemetry.take_theme_request(), None);
+        assert_eq!(p.telemetry.dev.take_view(), None);
+        assert_eq!(p.telemetry.dev.take_theme(), None);
         p.dev_cc = true;
         p.handle_event(cc(DEV_VIEW_CC, 2.0 / 127.0));
         p.handle_event(cc(DEV_DISCLOSURE_CC, 1.0));
         p.handle_event(cc(DEV_BROWSER_CC, 1.0));
         p.handle_event(cc(DEV_THEME_CC, 1.0 / 127.0));
-        assert_eq!(p.telemetry.take_view_request(), Some(2));
-        assert_eq!(p.telemetry.take_disclosure_request(), Some(true));
-        assert_eq!(p.telemetry.take_browser_request(), Some(true));
+        assert_eq!(p.telemetry.dev.take_view(), Some(2));
+        assert_eq!(p.telemetry.dev.take_disclosure(), Some(true));
+        assert_eq!(p.telemetry.dev.take_browser(), Some(true));
         assert_eq!(
-            p.telemetry.take_theme_request(),
+            p.telemetry.dev.take_theme(),
             Some(1),
             "1 is dark, as mxm_ui::theme::from_index reads it"
         );
