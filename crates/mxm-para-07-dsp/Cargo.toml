@@ -26,3 +26,5 @@ mxm-modulation = { workspace = true, features = ["conformance"] }
 # The listening demo writes through the collection's encoder. A test-only edge, so the shipped
 # graph carries only the routing.
 mxm-audio-file.workspace = true
+# The measurement example's ruler (`examples/measure.rs`). Test-only, like the encoder.
+mxm-measure.workspace = true

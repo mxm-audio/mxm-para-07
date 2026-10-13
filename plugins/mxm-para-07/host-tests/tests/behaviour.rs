@@ -17,9 +17,7 @@ const SAMPLE_RATE: f64 = 48_000.0;
 const SKIP: &str = "skipping: run `cargo xtask bundle mxm-para-07 --release`";
 
 fn bundle() -> Option<(PathBuf, PathBuf)> {
-    let dir = app_harness::workspace_root().join("target").join("bundled");
-    let file = dir.join("mxm-para-07.clap");
-    file.exists().then_some((dir, file))
+    mxm_player_harness::host_test::plugin_bundle("mxm-para-07")
 }
 fn session(name: &str) -> Option<Session> {
     let (dir, file) = bundle()?;
@@ -30,17 +28,19 @@ fn session(name: &str) -> Option<Session> {
 fn left(samples: &[f32]) -> Vec<f32> {
     samples.iter().step_by(2).copied().collect()
 }
+/// Peak magnitude of a capture. **Through `mxm-measure`, and the `expect` is the point**: the
+/// shared ruler reports absence for a non-finite buffer, where folding with `f32::max` would let a
+/// half-NaN render measure as healthy and pass every "it is silent" assertion below.
 fn peak(samples: &[f32]) -> f32 {
-    samples.iter().fold(0.0f32, |v, x| v.max(x.abs()))
+    mxm_measure::level::peak(samples).expect("the capture is finite")
 }
+/// How much of one frequency is in a captured window — **a relative figure**, as in the sibling
+/// host tests (`plugins/mxm-mono-00/host-tests/tests/behaviour.rs` says why). The shared probe reads
+/// a component's amplitude; the local copy this replaced read `|X|/N`, half of it, so a floor quoted
+/// from before the migration is 6 dB low and the floors below were doubled with it.
 fn magnitude_at(samples: &[f32], hz: f64) -> f64 {
-    let (mut re, mut im) = (0.0, 0.0);
-    for (i, sample) in samples.iter().enumerate() {
-        let a = std::f64::consts::TAU * hz * i as f64 / SAMPLE_RATE;
-        re += f64::from(*sample) * a.cos();
-        im += f64::from(*sample) * a.sin();
-    }
-    (re * re + im * im).sqrt() / samples.len().max(1) as f64
+    mxm_measure::spectrum::component_amplitude(samples, hz, SAMPLE_RATE)
+        .expect("the capture is non-empty and finite")
 }
 fn hz(note: u8) -> f64 {
     440.0 * 2f64.powf((f64::from(note) - 69.0) / 12.0)
@@ -155,14 +155,14 @@ fn highest_and_lowest_keys_drive_the_two_oscillators_through_one_gate() {
     let low = magnitude_at(&both, hz(48) * 2f64.powf(0.07 / 12.0));
     let high = magnitude_at(&both, hz(67));
     assert!(
-        low > 0.003 && high > 0.003,
+        low > 0.006 && high > 0.006,
         "both extremes must sound: low={low} high={high}"
     );
     s.app().note_on(57, 1.0);
     let middle = capture(&mut s, 30);
     assert!(
-        magnitude_at(&middle, hz(48) * 2f64.powf(0.07 / 12.0)) > 0.002
-            && magnitude_at(&middle, hz(67)) > 0.002,
+        magnitude_at(&middle, hz(48) * 2f64.powf(0.07 / 12.0)) > 0.004
+            && magnitude_at(&middle, hz(67)) > 0.004,
         "a middle press keeps the shared gate but owns neither pitch"
     );
     s.app().note_off(67);
@@ -215,6 +215,7 @@ fn trigger_parameter_edges_are_sample_accurate_and_restore_only_a_level() {
         block_size: 64,
         total_frames: 384,
         state: None,
+        tempo: None,
     };
     let trigger = nice_param_id("triggerinput");
     let event = |frame, value| ScheduledEvent {
@@ -350,6 +351,7 @@ fn both_audio_configurations_route_as_advertised_and_emit_no_events() {
         block_size: 64,
         total_frames: 8192,
         state: None,
+        tempo: None,
     };
     let note = ScheduledEvent {
         frame: 0,
@@ -430,6 +432,7 @@ fn a_session_naming_the_retired_external_ids_restores_everything_else() {
         block_size: 64,
         total_frames: 8192,
         state: None,
+        tempo: None,
     };
     let from_current = offline::render(
         &file,

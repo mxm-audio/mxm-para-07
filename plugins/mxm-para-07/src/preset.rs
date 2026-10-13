@@ -14,7 +14,7 @@ impl mxm_preset::Instrument for MxmPara07Params {
     fn clap_id(&self) -> &'static str {
         crate::CLAP_ID
     }
-    fn parameters(&self) -> Vec<(&'static str, &dyn mxm_preset::ErasedParam)> {
+    fn parameters(&self) -> Vec<(&'static str, &dyn mxm_params::ErasedParam)> {
         all_parameters(self)
             .into_iter()
             .chain(self.routes.parameters())
@@ -151,6 +151,19 @@ mod tests {
     ///
     /// Falsified before trusted: without `retire_external_key_mode` the session's key mode stays
     /// `external`, an id the parameter no longer knows.
+    /// **Every stored `text` is this plugin's own formatting of the `v` beside it**
+    /// (`mxm_preset::stale_factory_texts`).
+    #[test]
+    fn every_factory_text_is_this_plugins_formatting_of_its_value() {
+        let stale = mxm_preset::stale_factory_texts(&MxmPara07Params::default());
+        assert!(
+            stale.is_empty(),
+            "{} stale texts — regenerate the files:\n{}",
+            stale.len(),
+            stale.join("\n")
+        );
+    }
+
     #[test]
     fn a_state_that_chose_external_loads_as_one_pitch() {
         use crate::params::KeyModeKind;

@@ -16,14 +16,8 @@ fn note(v: i32, key: u8) -> NoteId {
     }
 }
 fn tone_amplitude(x: &[f32], hz: f32) -> f64 {
-    let mut re = 0.0;
-    let mut im = 0.0;
-    for (i, &s) in x.iter().enumerate() {
-        let a = std::f64::consts::TAU * f64::from(hz) * i as f64 / f64::from(FS);
-        re += f64::from(s) * a.cos();
-        im -= f64::from(s) * a.sin();
-    }
-    2.0 * (re * re + im * im).sqrt() / x.len() as f64
+    mxm_measure::spectrum::component_amplitude(x, f64::from(hz), f64::from(FS))
+        .expect("a finite, non-empty render")
 }
 
 fn main() {

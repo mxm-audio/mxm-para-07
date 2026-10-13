@@ -160,8 +160,9 @@ Full text: [NOTES.md § Realtime and numeric rules](NOTES.md#realtime-and-numeri
 - Add a test that fails when removing each evidenced restriction or wart. Mark assumptions as chosen,
   approximated or unverified rather than laundering them into facts.
 - Keep measurement code in this crate. Do not add effects: the source machine shipped with none.
-- Examples write only original generated WAV data, through the collection's encoder `mxm-audio-file`
-  — a test-only `[dev-dependencies]` edge. `[dependencies]` holds `mxm-modulation` alone.
+- Examples write only original generated WAV data, through the collection's encoder `mxm-audio-file`,
+  and `examples/measure.rs` reads tone amplitudes through `mxm-measure` — both test-only
+  `[dev-dependencies]` edges. `[dependencies]` holds `mxm-modulation` alone.
 
 ## Verification
 

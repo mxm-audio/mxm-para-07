@@ -657,7 +657,7 @@ impl Routes {
 
     /// Every routing parameter, named by its permanent id, for the preset layer. **Presets carry
     /// routing**, presences included, or a sound would load with somebody else's routes still in it.
-    pub fn parameters(&self) -> Vec<(&'static str, &dyn mxm_preset::ErasedParam)> {
+    pub fn parameters(&self) -> Vec<(&'static str, &dyn mxm_params::ErasedParam)> {
         let mut out = Vec::with_capacity(TARGETS * SOURCES * 2);
         // A refused pair is no parameter, so it is not in a preset either.
         for (index, (group, ids)) in self.each().into_iter().zip(ROUTE_IDS).enumerate() {
@@ -667,7 +667,7 @@ impl Routes {
                 }
                 out.push((
                     amount,
-                    group.amount_param(source) as &dyn mxm_preset::ErasedParam,
+                    group.amount_param(source) as &dyn mxm_params::ErasedParam,
                 ));
                 out.push((presence, group.presence_param(source)));
             }
@@ -766,7 +766,7 @@ mod tests {
     /// the first knob they turn, and no audio assertion can see it.
     #[test]
     fn a_route_reads_what_its_pair_delivers_and_reads_back() {
-        use mxm_preset::ErasedParam;
+        use mxm_params::ErasedParam;
         let r = Routes::new();
         let cases: [(&FloatParam, f32, &str); 10] = [
             (&r.vco1pitch.lfo, 1.0, "+12.00 st"),
@@ -801,7 +801,7 @@ mod tests {
     /// idempotent through a host's conversion, which `clap-validator`'s `param-conversions` rejects.
     #[test]
     fn every_reading_survives_the_hosts_round_trip_a_rounded_zero_included() {
-        use mxm_preset::ErasedParam;
+        use mxm_params::ErasedParam;
         let r = Routes::new();
         for group in r.each() {
             for s in 0..SOURCES {

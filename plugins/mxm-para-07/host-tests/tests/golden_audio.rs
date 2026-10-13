@@ -2,9 +2,8 @@
 //!
 //! Update the digest only with an intentional audio change after listening to the emitted WAV.
 
-use mxm_player_harness::app_harness;
-
 use mxm_player::session::{FRAMES_PER_BLOCK, Session};
+use mxm_player_harness::host_test::digest;
 use std::path::PathBuf;
 
 const PLUGIN: &str = "dk.mxm.mxm-para-07";
@@ -21,9 +20,7 @@ const DIGESTS_PINNED_HERE: bool = cfg!(target_os = "windows");
 const GOLDEN_SAMPLES: usize = 72 * FRAMES_PER_BLOCK * 2;
 
 fn bundle() -> Option<(PathBuf, PathBuf)> {
-    let dir = app_harness::workspace_root().join("target").join("bundled");
-    let file = dir.join("mxm-para-07.clap");
-    file.exists().then_some((dir, file))
+    mxm_player_harness::host_test::plugin_bundle("mxm-para-07")
 }
 fn score(session: &mut Session) -> Result<(), String> {
     session.advance_blocks(2)?;
@@ -39,16 +36,6 @@ fn score(session: &mut Session) -> Result<(), String> {
     session.advance_blocks(6)?;
     session.app().note_off(48);
     session.advance_blocks(22)
-}
-fn digest(samples: &[f32]) -> String {
-    let mut hash = 0xcbf2_9ce4_8422_2325u64;
-    for sample in samples {
-        for byte in sample.to_bits().to_le_bytes() {
-            hash ^= u64::from(byte);
-            hash = hash.wrapping_mul(0x0000_0100_0000_01b3);
-        }
-    }
-    format!("{hash:016x}")
 }
 fn render(name: &str) -> Option<(Vec<f32>, PathBuf)> {
     let (dir, file) = bundle()?;
