@@ -154,7 +154,9 @@ Full text: [NOTES.md § Realtime and numeric rules](NOTES.md#realtime-and-numeri
 - `all_sound_off` is a latch: it clears event lines and recursive state, keeps the press ledger, and
   wakes only on a fresh note, trigger, HOLD opening or S&H gate re-selection. `reset` restores
   deterministic cold state.
-- No shared DSP may be extracted from this first copy.
+- Shared DSP comes only from copies proven identical: the flush, saturators, prewarp, diode clamp and
+  ADSR this crate carried are `mxm-dsp`'s (the audit's O1); what is still local stays until another
+  identical copy is shown.
 
 ## Work Guidance
 
