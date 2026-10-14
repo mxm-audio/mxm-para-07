@@ -163,7 +163,7 @@ Full text: [NOTES.md § Realtime and numeric rules](NOTES.md#realtime-and-numeri
 - Keep measurement code in this crate. Do not add effects: the source machine shipped with none.
 - Examples write only original generated WAV data, through the collection's encoder `mxm-audio-file`,
   and `examples/measure.rs` reads tone amplitudes through `mxm-measure` — both test-only
-  `[dev-dependencies]` edges. `[dependencies]` holds `mxm-modulation` alone.
+  `[dev-dependencies]` edges. `[dependencies]` holds `mxm-modulation` and `mxm-rng`.
 
 ## Verification
 
