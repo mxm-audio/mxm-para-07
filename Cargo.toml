@@ -27,6 +27,7 @@ repository = "https://github.com/mxm-audio/mxm-para-07"
 # the kit's from mxm-kit v0.3.1, another product's from its repository at v0.1.0.
 egui = "=0.36.1"
 mxm-audio-file = { git = "https://github.com/mxm-audio/mxm-kit", branch = "main" }
+mxm-dsp = { git = "https://github.com/mxm-audio/mxm-kit", branch = "main" }
 mxm-modulation = { git = "https://github.com/mxm-audio/mxm-kit", branch = "main" }
 mxm-modulation-params = { git = "https://github.com/mxm-audio/mxm-kit", branch = "main" }
 mxm-para-07-dsp = { path = "crates/mxm-para-07-dsp" }

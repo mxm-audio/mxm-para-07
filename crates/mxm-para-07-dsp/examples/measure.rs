@@ -1,7 +1,7 @@
 //! Console measurement harness for the evidence-backed DSP seams.
 //! Run with `cargo run -p mxm-para-07-dsp --example measure --release`.
 #![allow(clippy::field_reassign_with_default)] // the report exposes one route at a time
-use mxm_para_07_dsp::envelope::{Adsr, Stage};
+use mxm_dsp::envelope::{Adsr, Stage};
 use mxm_para_07_dsp::filter::{K_MAX, Ladder};
 use mxm_para_07_dsp::keyboard::NoteId;
 use mxm_para_07_dsp::oscillator::{Range, Vco, Waveform};

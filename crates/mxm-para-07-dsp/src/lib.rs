@@ -8,7 +8,6 @@
 
 #[cfg(any(test, feature = "conformance"))]
 pub mod conformance;
-pub mod envelope;
 pub mod filter;
 pub mod keyboard;
 pub mod lfo;
@@ -30,24 +29,5 @@ pub(crate) fn safe_sample_rate(sample_rate: f32) -> f32 {
         sample_rate.max(MIN_SAMPLE_RATE)
     } else {
         DEFAULT_SAMPLE_RATE
-    }
-}
-
-/// Flush recursive state before it enters the denormal range. The relatively high
-/// threshold is about -400 dB and is what makes exact idle silence portable.
-#[inline(always)]
-pub fn flush(x: f32) -> f32 {
-    if x.abs() < 1e-20 { 0.0 } else { x }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn flush_keeps_the_numeric_contract() {
-        assert_eq!(flush(1e-30), 0.0);
-        assert_eq!(flush(-1e-30), 0.0);
-        assert_eq!(flush(0.25), 0.25);
     }
 }

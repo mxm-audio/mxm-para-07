@@ -14,7 +14,7 @@
 //! scope made plain. At 30 s a step at the default clock stays flat to under 1 % and
 //! the slowest clock tilts by about 6 %. Pending a measured unit.
 
-use crate::flush;
+use mxm_dsp::guard::flush;
 
 pub const SAMPLE_TIME_MIN_S: f32 = 0.013;
 pub const SAMPLE_TIME_MAX_S: f32 = 2.0;

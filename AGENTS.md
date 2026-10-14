@@ -142,7 +142,7 @@ breaks another is a broken change. CI builds and tests on all three when started
 
 | Crate | MSRV | Why |
 |---|---|---|
-| `crates/mxm-para-07-dsp` | **1.87** | The complete two-pitch paraphonic voice and its measurement examples. **Two runtime dependencies**, `mxm-modulation` and `mxm-rng`, both dependency-free at this same floor — the routing conversion and the shared generators added them; its demo dev-depends on `mxm-audio-file` |
+| `crates/mxm-para-07-dsp` | **1.87** | The complete two-pitch paraphonic voice and its measurement examples. **Three runtime dependencies**, `mxm-modulation`, `mxm-rng` and `mxm-dsp`, all dependency-free at this same floor — the routing conversion and the shared generators and primitives added them; its demo dev-depends on `mxm-audio-file` |
 | `plugins/mxm-para-07` | **1.95** | Its dynamically paged editor pulls in egui; depends on `mxm-para-07-dsp`, which stays at 1.87 |
 
 ## Licensing

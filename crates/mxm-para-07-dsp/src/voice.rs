@@ -8,14 +8,14 @@
 //! edges reach the envelope gates but do not get promoted to keyboard reset or
 //! auto-bend edges (`research:instruments/sh-7.md` §§4.3–4.7).
 
-use crate::envelope::{Adsr, Stage};
 use crate::filter::{self, Ladder};
-use crate::flush;
 use crate::keyboard::{Keyboard, NoteId, Outcome, Owner};
 use crate::lfo::{Lfo, Waveform as LfoWave};
 use crate::oscillator::{Range, Vco, Waveform};
 use crate::routing::{self, Graph, Routing};
 use crate::sh::{SampleHold, Source as ShSource};
+use mxm_dsp::envelope::{Adsr, Stage};
+use mxm_dsp::guard::flush;
 use mxm_modulation::standard;
 use mxm_rng::Xorshift32;
 
@@ -350,7 +350,9 @@ struct OnePole {
 impl OnePole {
     fn lp(&mut self, x: f32, hz: f32, fs: f32) -> f32 {
         let hz = hz.clamp(0.01, 0.45 * fs.max(1.0));
-        let g = filter::tan_approx(std::f64::consts::PI * f64::from(hz) / f64::from(fs.max(1.0)));
+        let g = mxm_dsp::shape::tan_approx(
+            std::f64::consts::PI * f64::from(hz) / f64::from(fs.max(1.0)),
+        );
         let big_g = (g / (1.0 + g)) as f32;
         let v = big_g * (x - self.state);
         let y = v + self.state;

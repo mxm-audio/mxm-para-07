@@ -173,8 +173,8 @@ The collection's performance sources and added routes mean here what they mean o
 
 ## Chosen and derived constants
 
-This table is the evidence row each constant's source comment points to (for example the envelope's,
-in `src/envelope.rs`).
+This table is the evidence row each constant's source comment points to (the envelope's are
+`mxm-dsp`'s, moved with the ADSR).
 
 | Constant / choice | Status and reason |
 |---|---|
@@ -252,3 +252,14 @@ unequal pitch-lag, pink and S&H histories after wake while matching retained not
 zero-control envelope test uses an explicit 10 ms de-click sabotage oracle and fixed
 48 kHz onset gates (>0.05 peak sample delta and >12 early-window absolute sum), below measured
 unsmoothed values 0.077 and 18.98 but above sabotaged values 0.0082 and 4.34.
+
+## The envelopes: who triggers them, and their curves
+
+Both envelopes are `mxm-dsp`'s ADSR (the audit's O1 moved it from the identical copy this crate
+carried). **Which events trigger one is the voice's decision**, not the envelope's: GATE+TRIG, GATE
+and LFO are three rules about *when* to call `Adsr::trigger`, and the keyboard block and the
+modulator supply the edges. **The segment curves are not the hardware's**, or rather nobody knows
+whether they are: `research:instruments/sh-7.md` §6.3 says Roland's discrete ADSRs of the period are
+nearly linear in attack and exponential after, and §11 lists the SH-7's own curves as unverified.
+Exponential with the overshoot is kept, and the curves are the first thing worth measuring if a unit
+appears.

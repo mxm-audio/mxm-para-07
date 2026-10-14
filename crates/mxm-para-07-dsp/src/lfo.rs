@@ -7,7 +7,7 @@
 //! The switched-inversion saw is rendered with a perfect seam: a residual seam and
 //! its possible doubled rate are explicitly unverified and are not invented.
 
-use crate::flush;
+use mxm_dsp::guard::flush;
 
 pub const RATE_MIN_HZ: f32 = 0.2;
 pub const RATE_MAX_HZ: f32 = 25.0;

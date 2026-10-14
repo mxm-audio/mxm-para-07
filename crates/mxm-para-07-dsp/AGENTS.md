@@ -8,10 +8,11 @@ identity as the product name. Hardware evidence is `research:instruments/sh-7.md
 are `docs/briefs/mxm-para-07.md` and `plans/plan-mxm-para-07.md` (in the private archive).
 
 MSRV is Rust 1.87. This crate owns the complete audio machine, tests, measurement harness and render
-demo. It has no plugin-framework or UI concerns and **two runtime dependencies**,
-[`mxm-modulation`](https://github.com/mxm-audio/mxm-kit/blob/main/crates/mxm-modulation/AGENTS.md) and
-[`mxm-rng`](https://github.com/mxm-audio/mxm-kit/blob/main/crates/mxm-rng/AGENTS.md) — the collection's
-shared routing and generators, each dependency-free and at this same floor. `cargo tree` is the check.
+demo. It has no plugin-framework or UI concerns and **three runtime dependencies**,
+[`mxm-modulation`](https://github.com/mxm-audio/mxm-kit/blob/main/crates/mxm-modulation/AGENTS.md),
+[`mxm-rng`](https://github.com/mxm-audio/mxm-kit/blob/main/crates/mxm-rng/AGENTS.md) and
+[`mxm-dsp`](https://github.com/mxm-audio/mxm-kit/blob/main/crates/mxm-dsp/AGENTS.md) — the collection's
+shared routing, generators and primitives, each dependency-free and at this same floor. `cargo tree` is the check.
 
 The evidence, research citations, measurements and owner rulings behind every rule below are in
 [NOTES.md](NOTES.md).
@@ -24,7 +25,7 @@ The evidence, research citations, measurements and owner rulings behind every ru
   registers, independently driven waveshapers, local antialiasing and core-only sync.
 - `src/lfo.rs`: one LFO, its destination-specific offsets, sine-only delay and keyboard reset.
 - `src/sh.rs`: independent S&H clock, source mux, hold droop and output lag.
-- `src/envelope.rs`: two instances of the local exponential ADSR; routing restrictions belong to
+- The envelopes: two instances of `mxm-dsp`'s exponential ADSR; routing restrictions belong to
   `voice.rs`.
 - `src/filter.rs`: one local TPT/ZDF four-CA3080 cascade with diode-limited global feedback.
 - `src/voice.rs`: signal graph, event-line ordering, portamento, routing, HPF, noise, ring,
@@ -163,7 +164,7 @@ Full text: [NOTES.md § Realtime and numeric rules](NOTES.md#realtime-and-numeri
 - Keep measurement code in this crate. Do not add effects: the source machine shipped with none.
 - Examples write only original generated WAV data, through the collection's encoder `mxm-audio-file`,
   and `examples/measure.rs` reads tone amplitudes through `mxm-measure` — both test-only
-  `[dev-dependencies]` edges. `[dependencies]` holds `mxm-modulation` and `mxm-rng`.
+  `[dev-dependencies]` edges. `[dependencies]` holds `mxm-modulation`, `mxm-rng` and `mxm-dsp`.
 
 ## Verification
 
