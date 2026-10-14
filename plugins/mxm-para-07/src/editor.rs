@@ -24,7 +24,6 @@ use mxm_ui::space::SPACE_5;
 use mxm_ui::theme::Tokens;
 use nice_plug::context::gui::GuiContext;
 use nice_plug::prelude::*;
-use nice_plug_egui::{EguiEditorState, NiceEguiApp, create_egui_editor};
 
 use crate::params::MxmPara07Params;
 use crate::telemetry::Telemetry;
@@ -176,34 +175,20 @@ impl Section {
 pub(crate) const BAR_PARAMETERS: &[&str] = &["volume"];
 
 pub fn create(params: Arc<MxmPara07Params>, telemetry: Arc<Telemetry>) -> Option<MxmPara07Editor> {
-    let state = EguiEditorState::from_size(
-        nice_plug::editor::dpi::LogicalSize::new(REFERENCE.0, REFERENCE.1),
-        1.0,
-    );
-    create_egui_editor(
-        state,
-        nice_plug_egui::RepaintNotifier::new(),
-        nice_plug_egui::EguiNiceSettings {
-            title: crate::NAME.to_owned(),
-            resize_hint: ResizeHint {
-                size_constraints: nice_plug::editor::SizeConstraints::min_logical_size(
-                    nice_plug::editor::dpi::LogicalSize::new(MINIMUM.0 as f32, MINIMUM.1 as f32),
-                ),
-                ..ResizeHint::RESIZABLE
-            },
-            ..Default::default()
-        },
+    mxm_editor::create(
+        crate::NAME,
+        REFERENCE,
+        MINIMUM,
         MxmPara07App::new(params, telemetry),
     )
 }
 
-pub type MxmPara07Editor = nice_plug_egui::EguiEditor<MxmPara07App>;
+pub type MxmPara07Editor = mxm_editor::Editor<MxmPara07App>;
 pub use mxm_preset::PresetUi;
 
 pub struct MxmPara07App {
     params: Arc<MxmPara07Params>,
     telemetry: Arc<Telemetry>,
-    gui_context: Option<GuiContext>,
     view: usize,
     text_entry: HashMap<&'static str, Option<String>>,
     presets: PresetUi,
@@ -218,7 +203,6 @@ impl MxmPara07App {
         Self {
             params,
             telemetry,
-            gui_context: None,
             view: 0,
             text_entry: HashMap::new(),
             presets,
@@ -227,23 +211,12 @@ impl MxmPara07App {
     }
 }
 
-impl NiceEguiApp for MxmPara07App {
-    fn build(
-        &mut self,
-        egui_ctx: egui::Context,
-        nice_gui_ctx: GuiContext,
-        _frame: &mut nice_plug_egui::Frame,
-    ) -> Result<(), nice_plug_egui::baseview::HandlerError> {
-        mxm_ui::shell::install(&egui_ctx);
-        self.gui_context = Some(nice_gui_ctx);
+impl mxm_editor::Panel for MxmPara07App {
+    fn opened(&mut self, _egui_ctx: &egui::Context, _nice_gui_ctx: &GuiContext) {
         self.telemetry.set_editor_open(true);
-        Ok(())
     }
 
-    fn ui(&mut self, ui: &mut Ui, _frame: &mut nice_plug_egui::Frame) {
-        let Some(gui_context) = self.gui_context.clone() else {
-            return;
-        };
+    fn ui(&mut self, ui: &mut Ui, gui_context: &GuiContext) {
         panel(
             ui,
             &self.params,
@@ -256,8 +229,7 @@ impl NiceEguiApp for MxmPara07App {
         );
     }
 
-    fn editor_closed(&mut self) {
-        self.gui_context = None;
+    fn closed(&mut self, _host: &GuiContext) {
         self.telemetry.set_editor_open(false);
     }
 }
@@ -1055,6 +1027,5 @@ mod tests {
         assert!(app.text_entry.is_empty());
         assert!(!app.presets.is_browser_open());
         assert!(app.nav.card().is_none());
-        assert!(app.gui_context.is_none());
     }
 }
