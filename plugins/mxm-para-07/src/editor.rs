@@ -234,14 +234,7 @@ impl NiceEguiApp for MxmPara07App {
         nice_gui_ctx: GuiContext,
         _frame: &mut nice_plug_egui::Frame,
     ) -> Result<(), nice_plug_egui::baseview::HandlerError> {
-        mxm_ui::theme::apply(&egui_ctx);
-        mxm_ui::typography::apply(&egui_ctx);
-        // Light by default, overridable with `MXM_EDITOR_THEME`; the reasoning, and why the
-        // default is not `System`, lives on `mxm_ui::theme::preference`.
-        egui_ctx.set_theme(mxm_ui::theme::preference());
-
-        // The keys of the keymap in use, in the folder newDAWn and every MXM editor share.
-        mxm_ui::navigation::use_shared_keymap(&egui_ctx);
+        mxm_ui::shell::install(&egui_ctx);
         self.gui_context = Some(nice_gui_ctx);
         self.telemetry.set_editor_open(true);
         Ok(())
@@ -301,28 +294,18 @@ pub fn panel(
         presets.set_browser_open(open);
     }
     // Applied and never stored: a capture run must not rewrite the choice made in the control.
-    if let Some(preference) = telemetry
-        .dev
-        .take_theme()
-        .and_then(mxm_ui::theme::from_index)
-    {
-        ui.ctx().set_theme(preference);
-    }
+    mxm_ui::shell::developer_theme(ui.ctx(), &telemetry.dev);
     // This editor has no disclosure: CC 118's request is consumed and changes nothing
     // (mxm-kit's `docs/plugin-conventions.md`, *A developer channel in every editor*).
     let _ = telemetry.dev.take_disclosure();
 
     let tokens = tokens_for(ui);
-    let peak = telemetry.meter.take();
-    let clipped = telemetry.meter.clipped();
     mxm_ui::AppBar::new(crate::NAME).show_with(
         ui,
         &tokens,
         |ui| mxm_preset::ui::preset_row(ui, &tokens, params, setter, presets),
         |ui| {
-            if mxm_ui::shell::level_meter(ui, &tokens, peak, clipped) {
-                telemetry.meter.clear_clip();
-            }
+            mxm_ui::shell::peak_meter(ui, &tokens, &telemetry.meter);
             // Design system §3.1 slot 6: the master output sits beside its meter.
             mxm_ui::navigation::bar_card(ui, VOLUME_CARD, |ui| {
                 ui.scope(|ui| {
