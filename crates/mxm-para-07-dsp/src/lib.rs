@@ -6,6 +6,8 @@
 //! topology-preserving one-poles and a fixed-iteration Newton solve. No third-party
 //! implementation was ported.
 
+use mxm_dsp::guard::finite_or;
+
 #[cfg(any(test, feature = "conformance"))]
 pub mod conformance;
 pub mod filter;
@@ -25,9 +27,5 @@ pub const DEFAULT_SAMPLE_RATE: f32 = 48_000.0;
 
 #[inline]
 pub(crate) fn safe_sample_rate(sample_rate: f32) -> f32 {
-    if sample_rate.is_finite() {
-        sample_rate.max(MIN_SAMPLE_RATE)
-    } else {
-        DEFAULT_SAMPLE_RATE
-    }
+    finite_or(sample_rate, DEFAULT_SAMPLE_RATE).max(MIN_SAMPLE_RATE)
 }
