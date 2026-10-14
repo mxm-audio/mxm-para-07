@@ -55,7 +55,8 @@
 //! table for rejected prototype solvers is claimed here because this crate does not
 //! contain a reproducer for those implementations.
 
-use crate::{Rng, flush};
+use crate::flush;
+use mxm_rng::Xorshift32;
 use std::f32::consts::PI;
 
 /// Resonance maps to `k` in `0..=K_MAX`, and `K_MAX` is **calibrated to the machine**:
@@ -227,7 +228,7 @@ pub struct Ladder {
     /// (`STAGE_SPREAD`). A property of the unit, not state: `reset` leaves it.
     trim: [f32; 4],
     /// Deterministic excitation source for self-oscillation.
-    rng: Rng,
+    rng: Xorshift32,
 }
 
 impl Default for Ladder {
@@ -239,10 +240,10 @@ impl Default for Ladder {
 impl Ladder {
     /// This unit's filter: four stages with the fixed seeded spread. What ships.
     pub fn new() -> Self {
-        let mut rng = Rng::new(SPREAD_SEED);
+        let mut rng = Xorshift32::new(SPREAD_SEED);
         let mut trim = [1.0f32; 4];
         for t in trim.iter_mut() {
-            *t = 1.0 + STAGE_SPREAD * rng.next_bipolar();
+            *t = 1.0 + STAGE_SPREAD * rng.bipolar_f32();
         }
         Self::with_trim(trim)
     }
@@ -258,7 +259,7 @@ impl Ladder {
             s: [0.0; 4],
             trim,
             // Fixed seed: excitation must be bit-repeatable so it can be tested.
-            rng: Rng::new(0x5EED_1101),
+            rng: Xorshift32::new(0x5EED_1101),
         }
     }
 
@@ -271,7 +272,7 @@ impl Ladder {
     /// the unit, not its state.
     pub fn reset(&mut self) {
         self.s = [0.0; 4];
-        self.rng = Rng::new(0x5EED_1101);
+        self.rng = Xorshift32::new(0x5EED_1101);
     }
 
     /// Process one sample.
@@ -296,7 +297,7 @@ impl Ladder {
         // (that is `flush`), and it is gated so that "no input, low resonance"
         // stays exactly zero.
         if resonance > EXCITATION_THRESHOLD {
-            u += EXCITATION_LEVEL * self.rng.next_bipolar();
+            u += EXCITATION_LEVEL * self.rng.bipolar_f32();
         }
 
         // Each TPT one-pole gives y = G*x + (1-G)*s. With per-stage trims the four G

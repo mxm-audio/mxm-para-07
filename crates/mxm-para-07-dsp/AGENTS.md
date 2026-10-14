@@ -8,9 +8,10 @@ identity as the product name. Hardware evidence is `research:instruments/sh-7.md
 are `docs/briefs/mxm-para-07.md` and `plans/plan-mxm-para-07.md` (in the private archive).
 
 MSRV is Rust 1.87. This crate owns the complete audio machine, tests, measurement harness and render
-demo. It has no plugin-framework or UI concerns and **one runtime dependency**,
-[`mxm-modulation`](https://github.com/mxm-audio/mxm-kit/blob/main/crates/mxm-modulation/AGENTS.md) — the collection's shared routing, itself
-dependency-free and at this same floor. `cargo tree` is the check.
+demo. It has no plugin-framework or UI concerns and **two runtime dependencies**,
+[`mxm-modulation`](https://github.com/mxm-audio/mxm-kit/blob/main/crates/mxm-modulation/AGENTS.md) and
+[`mxm-rng`](https://github.com/mxm-audio/mxm-kit/blob/main/crates/mxm-rng/AGENTS.md) — the collection's
+shared routing and generators, each dependency-free and at this same floor. `cargo tree` is the check.
 
 The evidence, research citations, measurements and owner rulings behind every rule below are in
 [NOTES.md](NOTES.md).

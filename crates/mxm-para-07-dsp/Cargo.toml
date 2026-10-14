@@ -3,8 +3,8 @@ name = "mxm-para-07-dsp"
 description = "DSP for mxm-para-07, framework-free and unit-testable"
 version.workspace = true
 edition.workspace = true
-# One runtime dependency, itself dependency-free and below this floor: the collection's shared
-# routing (`crates/mxm-modulation`). This framework-free crate therefore stays below the GUI floor;
+# Two runtime dependencies, each dependency-free and below this floor: the collection's shared
+# routing (`crates/mxm-modulation`) and generators (`crates/mxm-rng`). This framework-free crate therefore stays below the GUI floor;
 # `cargo tree` is the check.
 rust-version = "1.87"
 license.workspace = true
@@ -12,6 +12,7 @@ authors.workspace = true
 repository.workspace = true
 
 [dependencies]
+mxm-rng.workspace = true
 mxm-modulation.workspace = true
 
 [features]

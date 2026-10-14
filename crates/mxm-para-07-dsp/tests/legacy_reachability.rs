@@ -14,13 +14,13 @@
 //! input's envelope follower, and the owner removed the external input and everything on it on
 //! 2026-09-26, so there is no longer a path for either to reach.
 
-use mxm_para_07_dsp::Rng;
 use mxm_para_07_dsp::routing::{Graph, Routing, source, target};
 use mxm_para_07_dsp::voice::{
     AUTO_BEND_MAX_SEMITONES, BENDER_FILTER_OCTAVES, BENDER_VCO_CV_MAX_SEMITONES,
     BENDER_VCO_LFO_MAX_SEMITONES, FILTER_AUDIO_OCTAVES, FILTER_ENV_OCTAVES, FILTER_ENV_WEIGHT,
     FILTER_MOD_OCTAVES, VCO_LFO_SEMITONES, VCO_SH_SEMITONES,
 };
+use mxm_rng::Xorshift32;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 enum Pwm {
@@ -301,8 +301,8 @@ fn routed(r: &Routing, s: &Sources) -> [f32; 5] {
 
 #[test]
 fn every_legacy_state_is_reachable_by_routes() {
-    let mut rng = Rng::new(0x5eed_0007);
-    let mut unit = move || 0.5 * (rng.next_bipolar() + 1.0);
+    let mut rng = Xorshift32::new(0x5eed_0007);
+    let mut unit = move || 0.5 * (rng.bipolar_f32() + 1.0);
     let pick = |u: f32, n: usize| ((u * n as f32) as usize).min(n - 1);
     let mut worst = [0.0f32; 5];
 

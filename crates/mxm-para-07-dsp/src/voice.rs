@@ -10,13 +10,14 @@
 
 use crate::envelope::{Adsr, Stage};
 use crate::filter::{self, Ladder};
+use crate::flush;
 use crate::keyboard::{Keyboard, NoteId, Outcome, Owner};
 use crate::lfo::{Lfo, Waveform as LfoWave};
 use crate::oscillator::{Range, Vco, Waveform};
 use crate::routing::{self, Graph, Routing};
 use crate::sh::{SampleHold, Source as ShSource};
-use crate::{Rng, flush};
 use mxm_modulation::standard;
+use mxm_rng::Xorshift32;
 
 pub const DEFAULT_KEY: u8 = 60;
 pub const DEFAULT_CHANNEL: u8 = 0;
@@ -416,7 +417,7 @@ pub struct Voice {
     hpf: OnePole,
     pink_a: OnePole,
     pink_b: OnePole,
-    rng: Rng,
+    rng: Xorshift32,
     bends: [f32; 16],
     pedals: [f32; 16],
     /// The mod wheel and channel pressure, **retained per channel** like the bend and the pedal, so
@@ -481,7 +482,7 @@ impl Voice {
             hpf: OnePole::default(),
             pink_a: OnePole::default(),
             pink_b: OnePole::default(),
-            rng: Rng::new(0x0007_1978),
+            rng: Xorshift32::new(0x0007_1978),
             bends: [0.0; 16],
             pedals: [0.0; 16],
             wheels: [0.0; 16],
@@ -674,7 +675,7 @@ impl Voice {
         self.hpf.reset();
         self.pink_a.reset();
         self.pink_b.reset();
-        self.rng = Rng::new(0x0007_1978);
+        self.rng = Xorshift32::new(0x0007_1978);
         self.auto_bend = 0.0;
         self.pending_keyboard_gate_assertion = false;
         self.pending_keyboard_depression = false;
@@ -1014,7 +1015,7 @@ impl Voice {
             self.telemetry.auto_bend_started = true;
         }
 
-        let raw_noise = self.rng.next_bipolar();
+        let raw_noise = self.rng.bipolar_f32();
         // Firm passive approximation, loaded response unmeasured: two weighted
         // shelves use the printed parts' nominal 2.34 and 10.3 kHz corners. Keeping
         // a direct term avoids falsely turning the passive network into two
