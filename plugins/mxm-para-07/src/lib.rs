@@ -521,7 +521,36 @@ impl ClapPlugin for MxmPara07 {
     ];
 }
 
+impl Vst3Plugin for MxmPara07 {
+    /// Permanent, as `CLAP_ID` is: the CLAP id's hash written out, held to it by
+    /// `identity::the_vst3_class_id_is_the_clap_ids_hash`.
+    const VST3_CLASS_ID: [u8; 16] = [
+        0x4b, 0x42, 0xa7, 0x9a, 0xa6, 0x76, 0x98, 0x70, 0x6a, 0x49, 0xaf, 0x20, 0x31, 0xb9, 0x8e,
+        0x29,
+    ];
+    const VST3_SUBCATEGORIES: &'static [Vst3SubCategory] =
+        &[Vst3SubCategory::Instrument, Vst3SubCategory::Synth];
+}
+
 nice_export_clap!(MxmPara07);
+nice_export_vst3!(MxmPara07);
+
+/// The plugin's identity in each format.
+#[cfg(test)]
+mod identity {
+    use super::MxmPara07;
+    use mxm_plugin_test::formats;
+
+    #[test]
+    fn the_vst3_class_id_is_the_clap_ids_hash() {
+        formats::the_vst3_class_id_is_the_clap_ids_hash::<MxmPara07>();
+    }
+
+    #[test]
+    fn the_vst3_categories_follow_the_clap_features() {
+        formats::the_vst3_categories_follow_the_clap_features::<MxmPara07>();
+    }
+}
 
 #[cfg(test)]
 mod tests {
