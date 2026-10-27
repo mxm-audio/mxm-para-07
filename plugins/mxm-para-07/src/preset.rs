@@ -23,8 +23,13 @@ impl mxm_preset::Instrument for MxmPara07Params {
     fn identity(&self) -> &RwLock<PresetIdentity> {
         &self.preset
     }
-    fn factory_files(&self) -> &'static [(&'static str, &'static str)] {
+    /// The installed set, but in a unit test, which is loaded from no bundle: the repository's.
+    #[cfg(test)]
+    fn factory_files(&self) -> Vec<(String, String)> {
         FACTORY_FILES
+            .iter()
+            .map(|(name, json)| ((*name).to_owned(), (*json).to_owned()))
+            .collect()
     }
 
     fn default_missing_legacy_parameter(&self, id: &str) -> bool {
@@ -32,115 +37,22 @@ impl mxm_preset::Instrument for MxmPara07Params {
     }
 }
 
-pub const FACTORY_FILES: &[(&str, &str)] = &[
-    ("Open saw", include_str!("../presets/open-saw.json")),
-    (
-        "Split octaves",
-        include_str!("../presets/split-octaves.json"),
-    ),
-    ("Wide pair", include_str!("../presets/wide-pair.json")),
-    (
-        "Narrow beating",
-        include_str!("../presets/narrow-beating.json"),
-    ),
-    ("Square pair", include_str!("../presets/square-pair.json")),
-    ("Triangle air", include_str!("../presets/triangle-air.json")),
-    ("Pulse motion", include_str!("../presets/pulse-motion.json")),
-    (
-        "Envelope pulse",
-        include_str!("../presets/envelope-pulse.json"),
-    ),
-    ("Core lock", include_str!("../presets/core-lock.json")),
-    ("Broken lock", include_str!("../presets/broken-lock.json")),
-    (
-        "Register organ",
-        include_str!("../presets/register-organ.json"),
-    ),
-    (
-        "Deep registers",
-        include_str!("../presets/deep-registers.json"),
-    ),
-    (
-        "Bright registers",
-        include_str!("../presets/bright-registers.json"),
-    ),
-    ("Hollow stack", include_str!("../presets/hollow-stack.json")),
-    ("Full stack", include_str!("../presets/full-stack.json")),
-    ("Ring bell", include_str!("../presets/ring-bell.json")),
-    (
-        "Metallic ring",
-        include_str!("../presets/metallic-ring.json"),
-    ),
-    ("Low ring", include_str!("../presets/low-ring.json")),
-    ("White wind", include_str!("../presets/white-wind.json")),
-    ("Pink breath", include_str!("../presets/pink-breath.json")),
-    ("Round bass", include_str!("../presets/round-bass.json")),
-    (
-        "Register bass",
-        include_str!("../presets/register-bass.json"),
-    ),
-    ("Split bass", include_str!("../presets/split-bass.json")),
-    (
-        "Tracking bass",
-        include_str!("../presets/tracking-bass.json"),
-    ),
-    ("Rubber pulse", include_str!("../presets/rubber-pulse.json")),
-    ("Clear lead", include_str!("../presets/clear-lead.json")),
-    ("Glide lead", include_str!("../presets/glide-lead.json")),
-    ("Upward glide", include_str!("../presets/upward-glide.json")),
-    (
-        "Downward glide",
-        include_str!("../presets/downward-glide.json"),
-    ),
-    ("Auto rise", include_str!("../presets/auto-rise.json")),
-    ("Auto fall", include_str!("../presets/auto-fall.json")),
-    (
-        "Delayed vibrato",
-        include_str!("../presets/delayed-vibrato.json"),
-    ),
-    (
-        "Stepped pitch",
-        include_str!("../presets/stepped-pitch.json"),
-    ),
-    (
-        "Stepped filter",
-        include_str!("../presets/stepped-filter.json"),
-    ),
-    ("Clocked gate", include_str!("../presets/clocked-gate.json")),
-    ("Random drift", include_str!("../presets/random-drift.json")),
-    (
-        "Filter chatter",
-        include_str!("../presets/filter-chatter.json"),
-    ),
-    (
-        "Audio contour",
-        include_str!("../presets/audio-contour.json"),
-    ),
-    ("Soft brass", include_str!("../presets/soft-brass.json")),
-    ("Hard brass", include_str!("../presets/hard-brass.json")),
-    ("Slow strings", include_str!("../presets/slow-strings.json")),
-    ("Square pad", include_str!("../presets/square-pad.json")),
-    ("Moving pad", include_str!("../presets/moving-pad.json")),
-    (
-        "Dual envelope",
-        include_str!("../presets/dual-envelope.json"),
-    ),
-    (
-        "Second envelope",
-        include_str!("../presets/second-envelope.json"),
-    ),
-    ("Short click", include_str!("../presets/short-click.json")),
-    (
-        "Filter whistle",
-        include_str!("../presets/filter-whistle.json"),
-    ),
-    ("Held drone", include_str!("../presets/held-drone.json")),
-    (
-        "Clocked drone",
-        include_str!("../presets/clocked-drone.json"),
-    ),
-    ("Noise drone", include_str!("../presets/noise-drone.json")),
-];
+/// The factory set as it ships, `(name, json)` in its order: the repository's `presets/`, which
+/// is installed beside the plugin and read there (`mxm_preset::installed_factory_dir`). For the
+/// tests, the integration tests and the audits, which are loaded from no bundle; the plugin itself
+/// never reads it.
+pub static FACTORY_FILES: std::sync::LazyLock<Vec<(&'static str, &'static str)>> =
+    std::sync::LazyLock::new(|| {
+        let folder = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("presets");
+        mxm_preset::read_factory_dir(&folder)
+            .into_iter()
+            .map(|(file, json)| {
+                let name = mxm_preset::Preset::parse(&json, crate::CLAP_ID)
+                    .map_or(file, |preset| preset.name);
+                (&*String::leak(name), &*String::leak(json))
+            })
+            .collect()
+    });
 
 #[cfg(test)]
 mod tests {
