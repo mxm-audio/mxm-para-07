@@ -16,7 +16,7 @@ code.
 
 The Init patch sounds VCO-1 saw through an open filter. Every modulation amount starts at zero;
 VCO-2 is silent and seven cents sharp so raising it immediately reveals beating. Fifty categorized
-factory sounds are files installed with the plugin, beside the `.clap` and inside the `.vst3`, and
+factory sounds are files installed with the plugin, in its version's folder under the local data directory, and
 any CLAP host lists and loads them. Init is generated from parameter defaults and has no file to
 drift or delete.
 
